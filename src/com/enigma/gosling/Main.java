@@ -1,8 +1,11 @@
 package com.enigma.gosling;
 
+import com.enigma.gosling.service.InventoryServiceImpl;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
+    private static InventoryService inventoryService = new InventoryServiceImpl();
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
@@ -75,24 +78,93 @@ public class Main {
         System.out.println("Select book type:");
         System.out.println("1. Novel");
         System.out.println("2. Magazine");
+        int bookType = getIntInput("Enter book type: ");
+
+        System.out.print("Enter ID: ");
+        String id = scanner.nextLine();
+        System.out.print("Enter Title: ");
+        String title = scanner.nextLine();
+        System.out.print("Enter Publisher: ");
+        String publisher = scanner.nextLine();
+        int yearPublished = getIntInput("Enter Year Published: ");
+
+        if (bookType == 1) {
+            System.out.print("Enter Author: ");
+            String author = scanner.nextLine();
+            inventoryService.addBook(new Novel(id, title, publisher, yearPublished, author));
+        } else if (bookType == 2) {
+            System.out.print("Enter Period Type (e.g., Weekly, Monthly): ");
+            String periodType = scanner.nextLine();
+            inventoryService.addBook(new Magazine(id, title, publisher, yearPublished, periodType));
+        } else {
+            System.out.println("Invalid book type.");
+            return;
+        }
+        System.out.println("Book added successfully!");
      }
 
     private static void displayAllBooks() {
         System.out.println("\n----- ALL BOOKS -----");
+        List<Book> books = inventoryService.getAllBooks();
+        if (books.isEmpty()) {
+            System.out.println("No books in inventory.");
+        } else {
+            for (Book book : books) {
+                System.out.println("ID: " + book.getId() + ", Title: " + book.getTitle());
+            }
+        }
     }
 
     private static void searchBook() {
         System.out.println("\n----- SEARCH BOOK -----");
+        System.out.print("Enter title to search: ");
+        String title = scanner.nextLine();
+        List<Book> books = inventoryService.findBooksByTitle(title);
 
+        if (books.isEmpty()) {
+            System.out.println("No books found with that title.");
+        } else {
+            System.out.println("Found books:");
+            for (Book book : books) {
+                System.out.println("ID: " + book.getId() + ", Title: " + book.getTitle());
+            }
+        }
     }
 
     private static void updateExistingBook() {
         System.out.println("\n----- UPDATE BOOK -----");
+        System.out.print("Enter the ID of the book to update: ");
+        String id = scanner.nextLine();
+        Book existingBook = inventoryService.findBookById(id);
 
+        if (existingBook == null) {
+            System.out.println("Book with that ID not found.");
+            return;
+        }
+
+        System.out.print("Enter new Title: ");
+        String title = scanner.nextLine();
+        System.out.print("Enter new Publisher: ");
+        String publisher = scanner.nextLine();
+        int yearPublished = getIntInput("Enter new Year Published: ");
+
+        if (existingBook instanceof Novel) {
+            System.out.print("Enter new Author: ");
+            String author = scanner.nextLine();
+            inventoryService.updateBook(id, new Novel(id, title, publisher, yearPublished, author));
+        } else if (existingBook instanceof Magazine) {
+            System.out.print("Enter new Period Type: ");
+            String periodType = scanner.nextLine();
+            inventoryService.updateBook(id, new Magazine(id, title, publisher, yearPublished, periodType));
+        }
+        System.out.println("Book updated successfully!");
     }
 
     private static void deleteBook() {
         System.out.println("\n----- DELETE BOOK -----");
-
+        System.out.print("Enter the ID of the book to delete: ");
+        String id = scanner.nextLine();
+        inventoryService.deleteBook(id);
+        System.out.println("Book deleted successfully!");
     }
 }

@@ -1,3 +1,5 @@
+package com.enigma.gosling;
+
 public abstract class Book {
     private String id;
     private String title;

@@ -1,3 +1,5 @@
+package com.enigma.gosling;
+
  public class Magazine extends Book {
         private String periodType;
 

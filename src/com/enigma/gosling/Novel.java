@@ -1,3 +1,5 @@
+package com.enigma.gosling;
+
  public class Novel extends Book {
         private String author;
 
